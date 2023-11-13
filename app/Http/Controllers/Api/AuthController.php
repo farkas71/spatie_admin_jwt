@@ -92,9 +92,11 @@ class AuthController extends Controller
         ]);
     }
 
-    public function me()
+    public function me(Request $request)
     {
-        return response()->json(auth()->user());
+        return response()->json([
+            auth()->user(),
+            'token' => $request->bearerToken(),
+        ]);
     }
-
 }
