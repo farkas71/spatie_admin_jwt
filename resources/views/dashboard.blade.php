@@ -1,5 +1,4 @@
 <x-app-layout>
-
     @can('admin_dashboard')
         <x-slot name="header">
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
@@ -13,6 +12,9 @@
                     <div class="p-6 text-gray-900 dark:text-gray-100">
                         {{ __('JOGOSULTSÁGGAL EZT A DASHBOARDOT LÁTJA') }}
                     </div>
+                    <div class="container text-break">
+                        <p><b>Az aktuális token:</b> {{ Cache::get('token') }}</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -23,6 +25,10 @@
                     <div class="p-6 text-gray-900 dark:text-gray-100">
                         {{ __('AKINEK NINCS JOGOSULTSÁGA EZT A DASHBOARDOT LÁTJA') }}
                     </div>
+                    <div class="container text-break">
+                        <p><b>Az aktuális token:</b> {{ Cache::get('token') }}</p>
+                    </div>
+
                 </div>
             </div>
         </div>

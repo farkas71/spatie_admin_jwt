@@ -23,7 +23,7 @@ class AdminSeeder extends Seeder
             // 'email_verified_at' => now(),
             'password' => Hash::make('00000000'),
             // 'remember_token' => Str::random(10),
-        ])->assignRole('superadmin');
+        ])->assignRole('superadmin', 'adminTest');
 
         User::create([
             'name' => 'admin',
@@ -31,7 +31,7 @@ class AdminSeeder extends Seeder
             // 'email_verified_at' => now(),
             'password' => Hash::make('11111111'),
             // 'remember_token' => Str::random(10),
-        ])->assignRole('admin');
+        ])->assignRole('admin', 'adminTest');
 
         User::create([
             'name' => 'user',

@@ -39,6 +39,10 @@ class RoleAndPermissionSeeder extends Seeder
         $otherPermission2 = Permission::create(['name' => 'admin_profil']);
         $otherPermission3 = Permission::create(['name' => 'admin_dashboard']);
 
+        // OTHER MODEL
+        // $adminTest = Permission::create(['name' => 'admin_test']);
+
+
 
         Role::create(['name' => 'superadmin'])
             ->syncPermissions(Permission::all());
@@ -58,6 +62,11 @@ class RoleAndPermissionSeeder extends Seeder
 
                 $otherPermission1,
                 $otherPermission3,
+            ]);
+
+        Role::create(['name' => 'adminTest'])
+            ->syncPermissions([
+                // $adminTest,
             ]);
 
 

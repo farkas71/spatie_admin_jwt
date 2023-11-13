@@ -10,6 +10,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
+use Illuminate\Support\Facades\Cache;
+
+
 class AuthenticatedSessionController extends Controller
 {
     /**
@@ -27,9 +30,29 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
-        $request->session()->regenerate();
+        $user = $request->user();
 
-        return redirect()->intended(RouteServiceProvider::HOME);
+        $credentials = $this->validate(request(),
+            [
+                'email' => 'required',
+                'password' => 'required',
+            ]
+        );
+
+        // A felhasználó jogosultságának ellenőrzése Spatie-vel
+        if ($user->hasRole('adminTest')) {
+            $request->session()->regenerate();
+            $token = auth('api')->attempt($credentials);
+
+            // Token mentése cache-be
+            Cache::put('token', $token);
+            
+            return redirect()->intended(RouteServiceProvider::HOME)
+                   ->with(['success' => 'Van adminTest jogosúltsága!']);
+        }
+
+        return redirect()->intended(RouteServiceProvider::HOME)
+               ->with(['danger_message' =>'Nincs adminTest jogosúltsága!']);
     }
 
     /**
@@ -38,6 +61,9 @@ class AuthenticatedSessionController extends Controller
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();
+        
+        // Token törlése cache-ből
+        Cache::forget('token');
 
         $request->session()->invalidate();
 
