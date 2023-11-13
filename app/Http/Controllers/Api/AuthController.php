@@ -14,15 +14,15 @@ class AuthController extends Controller
 {
     // itt is megadható így az összes metódusra érvényes lesz, kivéve a register() és login()-ra
     // vagy route utvonalnál...
-    public function __construct()
-    {
-        $this->middleware('auth:api', [
-            'except' => [
-                'login',
-                'register',
-            ]
-        ]);
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware('auth:api', [
+    //         'except' => [
+    //             'login',
+    //             'register',
+    //         ]
+    //     ]);
+    // }
 
     public function register(Request $request)
     {
@@ -80,4 +80,21 @@ class AuthController extends Controller
             'expire' => $expirationDate,
         ]);
     }
+
+    
+    public function logout()
+    {
+        auth('api')->logout();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Sikeres kijelentkezés',
+        ]);
+    }
+
+    public function me()
+    {
+        return response()->json(auth()->user());
+    }
+
 }
