@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\User;
 
+use Spatie\Permission\Models\Role;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Carbon\Carbon;
 
@@ -38,13 +39,10 @@ class AuthController extends Controller
             'password' => $request->password,
         ]);
 
-        $token = auth('api')->login($user);
-
         return response()->json([
             'status' => 'success',
-            'message' => 'Felhasználó regisztrálva',
+            'message' => 'Felhasználó regisztrálva jogosulságok nélkül!',
             'user' => $user,
-            'token' => $token,
         ]);
     }
 
@@ -57,15 +55,28 @@ class AuthController extends Controller
         ]);
 
         $credentials = request(['email', 'password']);
+        $user = auth('api')->attempt($credentials);
 
-        $token = auth('api')->attempt($credentials);
-
-        if (!$token) {
+        if (!$user) {
             return response()->json([
-                'status' => 'error',
-                'message' => 'Bejelentkezés sikertelen!'
+                'status' => 'errors',
+                'message' => 'Sikertelen bejelentkezés!',
             ]);
         }
+
+
+        // --------------Spatie Role jogosultság ellenőrzés------------
+
+        $user = auth('api')->user();
+
+        if (!$user->hasRole('adminTest')) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Sikeres bejelentkezés!',
+            ]);
+        }
+
+        $token = auth('api')->attempt($credentials);
 
         // token lejáratának időpntja dátum formátumban
         $decodedToken = JWTAuth::setToken($token)->getPayload();
@@ -74,23 +85,13 @@ class AuthController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Sikeres bejelentkezés',
+            'message' => 'Sikeres bejelentkezés adminTest jogosultsággal!',
             'token' => $token,
             'token_type' => 'Bearer',
             'expire' => $expirationDate,
         ]);
     }
 
-    
-    public function logout()
-    {
-        auth('api')->logout();
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Sikeres kijelentkezés',
-        ]);
-    }
 
     public function me(Request $request)
     {
@@ -101,4 +102,16 @@ class AuthController extends Controller
             'token' => $token,
         ]);
     }
+
+
+    public function logout()
+    {
+        auth('api')->logout();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Sikeres kijelentkezés',
+        ]);
+    }
+
 }
