@@ -94,9 +94,11 @@ class AuthController extends Controller
 
     public function me(Request $request)
     {
+        $token = $request->bearerToken(); 
+
         return response()->json([
             auth()->user(),
-            'token' => $request->bearerToken(),
+            'token' => $token,
         ]);
     }
 }
